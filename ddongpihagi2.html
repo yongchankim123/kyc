@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #87CEEB;
+    }
+
+    #player {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50px;
+      height: 50px;
+      background-color: #32CD32;
+    }
+
+    .poop {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background-color: brown;
+    }
+
+    #score {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      font-size: 24px;
+      color: #ffffff;
+    }
+  </style>
+  <title>똥피하기 게임</title>
+</head>
+<body>
+  <div id="score">점수: 0</div>
+  <div id="player"></div>
+
+  <script>
+    const player = document.getElementById('player');
+    let score = 0;
+
+    document.addEventListener('keydown', movePlayer);
+
+    function movePlayer(event) {
+      if (event.key === 'ArrowLeft' && player.offsetLeft > 0) {
+        player.style.left = player.offsetLeft - 10 + 'px';
+      } else if (event.key === 'ArrowRight' && player.offsetLeft < window.innerWidth - player.offsetWidth) {
+        player.style.left = player.offsetLeft + 10 + 'px';
+      }
+    }
+
+    function createPoop() {
+      const poop = document.createElement('div');
+      poop.classList.add('poop');
+      poop.style.left = Math.random() * (window.innerWidth - 20) + 'px';
+      document.body.appendChild(poop);
+
+      const poopInterval = setInterval(() => {
+        const poopBottom = poop.offsetTop + poop.offsetHeight;
+        const playerBottom = player.offsetTop + player.offsetHeight;
+
+        if (poopBottom > window.innerHeight - player.offsetHeight &&
+            poopBottom < window.innerHeight &&
+            Math.abs(poop.offsetLeft - player.offsetLeft) < player.offsetWidth) {
+          clearInterval(poopInterval);
+          alert('게임 오버! 점수: ' + score);
+          window.location.reload(); // 게임 오버 후 새로고침
+        }
+
+        if (poop.offsetTop > window.innerHeight) {
+          clearInterval(poopInterval);
+          poop.remove();
+          score++;
+          updateScore();
+        } else {
+          poop.style.top = poop.offsetTop + 5 + 'px';
+        }
+      }, 20);
+    }
+
+    function updateScore() {
+      document.getElementById('score').textContent = '점수: ' + score;
+    }
+
+    setInterval(createPoop, 200);
+  </script>
+</body>
+</html>
